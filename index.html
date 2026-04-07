@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Burst Cloud — Dual-mode cloud burst LLM router</title>
+    <meta name="description" content="Route LLM inference between local GPUs and cloud with automatic failover, data sovereignty, and cost controls. Open source.">
+    <meta property="og:title" content="AI Burst Cloud">
+    <meta property="og:description" content="Stop choosing between cheap and private. Burst to the cloud when you need scale. Stay local when your data demands it.">
+    <meta property="og:url" content="https://aiburstcloud.com">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0d1117;
+            --bg-card: #161b22;
+            --bg-terminal: #0d1117;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-dim: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --orange: #d29922;
+            --red: #f85149;
+            --purple: #bc8cff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* --- NAV --- */
+        nav {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+        }
+        .logo span { color: var(--accent); }
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-left: 28px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        /* --- HERO --- */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 16px;
+        }
+        .hero .tagline {
+            font-size: clamp(18px, 2.5vw, 22px);
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        .hero .tagline strong { color: var(--text); }
+        .badge-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        /* --- TERMINAL --- */
+        .terminal {
+            background: var(--bg-terminal);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: left;
+            overflow: hidden;
+        }
+        .terminal-bar {
+            background: var(--bg-card);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: var(--red); }
+        .terminal-dot.yellow { background: var(--orange); }
+        .terminal-dot.green { background: var(--green); }
+        .terminal-title {
+            color: var(--text-dim);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .terminal-body {
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            min-height: 200px;
+        }
+        .terminal-body .prompt { color: var(--green); }
+        .terminal-body .cmd { color: var(--text); }
+        .terminal-body .comment { color: var(--text-dim); }
+        .terminal-body .output { color: var(--text-dim); }
+        .terminal-body .highlight { color: var(--accent); }
+        .terminal-body .warn { color: var(--orange); }
+
+        .line {
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .line:nth-child(1)  { animation-delay: 0.3s; }
+        .line:nth-child(2)  { animation-delay: 0.9s; }
+        .line:nth-child(3)  { animation-delay: 1.5s; }
+        .line:nth-child(4)  { animation-delay: 2.0s; }
+        .line:nth-child(5)  { animation-delay: 2.3s; }
+        .line:nth-child(6)  { animation-delay: 2.6s; }
+        .line:nth-child(7)  { animation-delay: 2.9s; }
+        .line:nth-child(8)  { animation-delay: 3.2s; }
+        .line:nth-child(9)  { animation-delay: 3.5s; }
+        .line:nth-child(10) { animation-delay: 3.8s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- INSTALL --- */
+        .install {
+            padding: 60px 0;
+        }
+        .install h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 32px;
+        }
+        .install-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .install-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .install-card h3 {
+            font-size: 14px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .code-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--green);
+            position: relative;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover { color: var(--text); border-color: var(--text-dim); }
+
+        /* --- MODES --- */
+        .modes {
+            padding: 60px 0;
+        }
+        .modes h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .modes .subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            margin-bottom: 32px;
+        }
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        .mode-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 28px;
+        }
+        .mode-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .mode-card .mode-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+        }
+        .mode-card .flow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-dim);
+            background: var(--bg);
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+        }
+        .mode-card .flow .primary { color: var(--green); }
+        .mode-card .flow .burst { color: var(--orange); }
+        .mode-card p {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        /* --- AXES --- */
+        .axes {
+            padding: 60px 0;
+        }
+        .axes h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 32px;
+        }
+        .axes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .axis-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+        }
+        .axis-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .axis-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        .axis-card p {
+            font-size: 14px;
+            color: var(--text-dim);
+        }
+
+        /* --- CTA --- */
+        .cta {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .cta h2 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .cta p {
+            color: var(--text-dim);
+            margin-bottom: 28px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #0d1117;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary {
+            border: 1px solid var(--border);
+            color: var(--text);
+            margin-left: 12px;
+        }
+        .btn-secondary:hover { border-color: var(--text-dim); }
+
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+        footer a { color: var(--text-dim); text-decoration: none; }
+        footer a:hover { color: var(--text); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 600px) {
+            .hero { padding: 48px 0 40px; }
+            .terminal-body { font-size: 12px; padding: 14px; }
+            .install, .modes, .axes { padding: 40px 0; }
+            .nav-links a { margin-left: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="container">
+        <a href="/" class="logo">ai<span>burst</span>cloud</a>
+        <div class="nav-links">
+            <a href="https://github.com/aiburstcloud/aiburstcloud">GitHub</a>
+            <a href="https://github.com/aiburstcloud/aiburstcloud#quick-start">Docs</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <div class="badge-row">
+            <span class="badge">MIT Licensed</span>
+            <span class="badge">OpenAI Compatible</span>
+            <span class="badge">Docker Native</span>
+        </div>
+        <h1>Stop choosing between<br>cheap and private.</h1>
+        <p class="tagline">
+            <strong>AI Burst Cloud</strong> routes LLM inference between your local GPU and the cloud.
+            Burst when you need scale. Stay local when your data demands it.
+        </p>
+        <div class="terminal">
+            <div class="terminal-bar">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+                <span class="terminal-title">terminal</span>
+            </div>
+            <div class="terminal-body">
+                <div class="line"><span class="comment"># Install in one line</span></div>
+                <div class="line"><span class="prompt">$ </span><span class="cmd">pip install git+https://github.com/aiburstcloud/aiburstcloud.git</span></div>
+                <div class="line">&nbsp;</div>
+                <div class="line"><span class="comment"># Start the router</span></div>
+                <div class="line"><span class="prompt">$ </span><span class="cmd">aiburstcloud</span></div>
+                <div class="line"><span class="output">INFO: AI Burst Cloud starting in <span class="highlight">edge_burst</span> mode</span></div>
+                <div class="line"><span class="output">INFO: Uvicorn running on http://0.0.0.0:8000</span></div>
+                <div class="line">&nbsp;</div>
+                <div class="line"><span class="comment"># Requests route automatically</span></div>
+                <div class="line"><span class="output">Route: <span class="highlight">local</span>  | reason=local_available | budget=$5.00</span></div>
+                <div class="line"><span class="output">Route: <span class="warn">cloud</span>  | reason=local_overloaded_burst_to_cloud | budget=$4.98</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="install">
+    <div class="container">
+        <h2>Get started in seconds</h2>
+        <div class="install-grid">
+            <div class="install-card">
+                <h3>One line</h3>
+                <div class="code-block" id="install-curl">curl -fsSL https://raw.githubusercontent.com/aiburstcloud/aiburstcloud/main/install.sh | bash<button class="copy-btn" onclick="copyCode('install-curl')">Copy</button></div>
+            </div>
+            <div class="install-card">
+                <h3>Pip</h3>
+                <div class="code-block" id="install-pip">pip install git+https://github.com/aiburstcloud/aiburstcloud.git<button class="copy-btn" onclick="copyCode('install-pip')">Copy</button></div>
+            </div>
+            <div class="install-card">
+                <h3>Docker</h3>
+                <div class="code-block" id="install-docker">git clone https://github.com/aiburstcloud/aiburstcloud.git
+cd aiburstcloud && docker compose up -d<button class="copy-btn" onclick="copyCode('install-docker')">Copy</button></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="modes">
+    <div class="container">
+        <h2>Two burst modes</h2>
+        <p class="subtitle">Choose your default. Override per-request.</p>
+        <div class="modes-grid">
+            <div class="mode-card">
+                <h3>edge_burst</h3>
+                <div class="mode-label">Local GPU primary, cloud overflow</div>
+                <div class="flow">
+User &rarr; <span class="primary">Local GPU</span> (primary, free)
+&nbsp;&nbsp;&nbsp;&nbsp; &searr; <span class="burst">Cloud GPU</span> (burst when overloaded)
+                </div>
+                <p>Best for cost optimization. Data stays local by default. Cloud is the safety valve.</p>
+            </div>
+            <div class="mode-card">
+                <h3>cloud_burst</h3>
+                <div class="mode-label">Cloud primary, local for sensitive data</div>
+                <div class="flow">
+User &rarr; <span class="primary">Cloud GPU</span> (primary, fast)
+&nbsp;&nbsp;&nbsp;&nbsp; &searr; <span class="burst">Local GPU</span> (sensitive data only)
+                </div>
+                <p>Best for performance-first teams that need sovereignty-on-demand for regulated data.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="axes">
+    <div class="container">
+        <h2>Three-axis routing engine</h2>
+        <div class="axes-grid">
+            <div class="axis-card">
+                <div class="axis-icon">&#x1f512;</div>
+                <h3>Data Sovereignty</h3>
+                <p>Sensitive keywords detected? Always routed to your local GPU. In both modes. No exceptions.</p>
+            </div>
+            <div class="axis-card">
+                <div class="axis-icon">&#x1f4b0;</div>
+                <h3>Cost Control</h3>
+                <p>Set a daily cloud budget. When it's exhausted, requests fall back to local. No surprise bills. Ever.</p>
+            </div>
+            <div class="axis-card">
+                <div class="axis-icon">&#x26a1;</div>
+                <h3>Latency Optimization</h3>
+                <p>Primary backend overloaded? Automatically burst to the secondary. Sub-second failover.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <h2>Open source. MIT licensed. Free forever.</h2>
+        <p>Works with Ollama, vLLM, llama.cpp, RunPod, Modal, and any OpenAI-compatible endpoint.</p>
+        <a href="https://github.com/aiburstcloud/aiburstcloud" class="btn btn-primary">Star on GitHub</a>
+        <a href="https://github.com/aiburstcloud/aiburstcloud#quick-start" class="btn btn-secondary">Read the docs</a>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <a href="https://github.com/aiburstcloud">AI Burst Cloud</a> &middot; MIT License &middot; Built for teams that care about cost and privacy.
+    </div>
+</footer>
+
+<script>
+function copyCode(id) {
+    const el = document.getElementById(id);
+    const text = el.textContent.replace('Copy', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = el.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+}
+</script>
+
+</body>
+</html>
