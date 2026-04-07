@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="c" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#58a6ff"/>
+      <stop offset="100%" stop-color="#388bfd"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd43b"/>
+      <stop offset="100%" stop-color="#f59f00"/>
+    </linearGradient>
+  </defs>
+  <!-- Cloud -->
+  <path d="M25 20H9.5c-2.8 0-5-2.2-5-5 0-2.6 2-4.7 4.5-5C9.2 7 11.8 5 15 5c2.7 0 5 1.5 6.1 3.8.3-.1.7-.1 1.1-.1 2.5 0 4.5 2 4.5 4.5 0 .2 0 .4-.1.6C28.2 14.6 29 16 29 17.8 29 20 27.2 20 25 20z"
+        fill="url(#c)" opacity="0.9"/>
+  <!-- Bolt -->
+  <path d="M17.5 10l-4.5 7.5h3.5l-1.5 7 6-9h-4l2-5.5z"
+        fill="url(#b)"/>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="cloud-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#58a6ff"/>
+      <stop offset="100%" stop-color="#388bfd"/>
+    </linearGradient>
+    <linearGradient id="bolt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd43b"/>
+      <stop offset="100%" stop-color="#f59f00"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Cloud shape -->
+  <path d="M390 310H148c-44.2 0-80-35.8-80-80 0-41.3 31.3-75.3 71.5-79.4C147.8 105.6 189.5 72 240 72c42.4 0 79.1 24.4 96.8 60 5.4-1.3 11-2 16.8-2 39.8 0 72 32.2 72 72 0 3.4-.2 6.8-.7 10C448.5 222.4 464 246.8 464 276c0 37.6-30.4 68-68 68h-6z"
+        fill="url(#cloud-grad)" opacity="0.9"/>
+
+  <!-- Lightning bolt -->
+  <path d="M280 168l-72 120h56l-24 112 96-144h-64l32-88z"
+        fill="url(#bolt-grad)" filter="url(#glow)"/>
+
+  <!-- Burst rays from bolt -->
+  <g stroke="#ffd43b" stroke-width="3" stroke-linecap="round" opacity="0.6">
+    <line x1="220" y1="248" x2="190" y2="238"/>
+    <line x1="224" y1="272" x2="192" y2="280"/>
+    <line x1="328" y1="240" x2="358" y2="230"/>
+    <line x1="324" y1="264" x2="356" y2="272"/>
+    <line x1="256" y1="168" x2="246" y2="140"/>
+    <line x1="296" y1="172" x2="310" y2="146"/>
+  </g>
+
+  <!-- Small upward burst particles -->
+  <circle cx="238" cy="130" r="4" fill="#ffd43b" opacity="0.5"/>
+  <circle cx="318" cy="138" r="3" fill="#ffd43b" opacity="0.4"/>
+  <circle cx="182" cy="232" r="3" fill="#ffd43b" opacity="0.3"/>
+  <circle cx="366" cy="226" r="3" fill="#ffd43b" opacity="0.3"/>
+</svg>
