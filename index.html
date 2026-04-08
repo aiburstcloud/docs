@@ -184,7 +184,7 @@
         }
         .install-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
         }
         .install-card {
@@ -361,9 +361,11 @@
         footer a:hover { color: var(--text); }
 
         /* --- RESPONSIVE --- */
+        @media (max-width: 900px) {
+            .install-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 600px) {
             .hero { padding: 48px 0 40px; }
-            .terminal-body { font-size: 12px; padding: 14px; }
             .install, .modes, .axes { padding: 40px 0; }
             .install-grid { grid-template-columns: 1fr; }
             .nav-links a { margin-left: 16px; }
@@ -389,6 +391,7 @@
             <span class="badge">OpenAI Compatible</span>
             <span class="badge">Docker Native</span>
             <span class="badge">OpenClaw Skill</span>
+            <span class="badge">Claude Code Skill</span>
         </div>
         <h1>Stop choosing between<br>cheap and private.</h1>
         <p class="tagline">
@@ -396,25 +399,7 @@
             Burst when you need scale. Stay local when your data demands privacy.
         </p>
         <div class="terminal">
-            <div class="terminal-bar">
-                <div class="terminal-dot red"></div>
-                <div class="terminal-dot yellow"></div>
-                <div class="terminal-dot green"></div>
-                <span class="terminal-title">terminal</span>
-            </div>
-            <div class="terminal-body">
-                <div class="line"><span class="comment"># Install in one line</span></div>
-                <div class="line"><span class="prompt">$ </span><span class="cmd">pip install git+https://github.com/aiburstcloud/aiburstcloud.git</span></div>
-                <div class="line">&nbsp;</div>
-                <div class="line"><span class="comment"># Start the router</span></div>
-                <div class="line"><span class="prompt">$ </span><span class="cmd">aiburstcloud</span></div>
-                <div class="line"><span class="output">INFO: AI Burst Cloud starting in <span class="highlight">edge_burst</span> mode</span></div>
-                <div class="line"><span class="output">INFO: Uvicorn running on http://0.0.0.0:8000</span></div>
-                <div class="line">&nbsp;</div>
-                <div class="line"><span class="comment"># Requests route automatically</span></div>
-                <div class="line"><span class="output">Route: <span class="highlight">local</span>  | reason=local_available | budget=$5.00</span></div>
-                <div class="line"><span class="output">Route: <span class="warn">cloud</span>  | reason=local_overloaded_burst_to_cloud | budget=$4.98</span></div>
-            </div>
+            <img src="demo/aiburstcloud-demo.gif" alt="AI Burst Cloud terminal demo — install, route, burst" style="width:100%;border-radius:8px;">
         </div>
     </div>
 </section>
@@ -439,6 +424,12 @@ cd aiburstcloud && docker compose up -d<button class="copy-btn" onclick="copyCod
             <div class="install-card">
                 <h3>OpenClaw / NemoClaw</h3>
                 <div class="code-block" id="install-openclaw">openclaw skills install aiburstcloud<button class="copy-btn" onclick="copyCode('install-openclaw')">Copy</button></div>
+            </div>
+            <div class="install-card">
+                <h3>Claude Code</h3>
+                <div class="code-block" id="install-claude">git clone https://github.com/aiburstcloud/aiburstcloud.git
+cd aiburstcloud
+# skill auto-discovers: /aiburstcloud start<button class="copy-btn" onclick="copyCode('install-claude')">Copy</button></div>
             </div>
         </div>
     </div>
