@@ -184,7 +184,7 @@
         }
         .install-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
         }
         .install-card {
@@ -365,6 +365,7 @@
             .hero { padding: 48px 0 40px; }
             .terminal-body { font-size: 12px; padding: 14px; }
             .install, .modes, .axes { padding: 40px 0; }
+            .install-grid { grid-template-columns: 1fr; }
             .nav-links a { margin-left: 16px; }
         }
     </style>
@@ -387,6 +388,7 @@
             <span class="badge">MIT Licensed</span>
             <span class="badge">OpenAI Compatible</span>
             <span class="badge">Docker Native</span>
+            <span class="badge">OpenClaw Skill</span>
         </div>
         <h1>Stop choosing between<br>cheap and private.</h1>
         <p class="tagline">
@@ -433,6 +435,10 @@
                 <h3>Docker</h3>
                 <div class="code-block" id="install-docker">git clone https://github.com/aiburstcloud/aiburstcloud.git
 cd aiburstcloud && docker compose up -d<button class="copy-btn" onclick="copyCode('install-docker')">Copy</button></div>
+            </div>
+            <div class="install-card">
+                <h3>OpenClaw / NemoClaw</h3>
+                <div class="code-block" id="install-openclaw">openclaw skills install aiburstcloud<button class="copy-btn" onclick="copyCode('install-openclaw')">Copy</button></div>
             </div>
         </div>
     </div>
