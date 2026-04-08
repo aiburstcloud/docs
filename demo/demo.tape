@@ -5,8 +5,9 @@ Output demo/aiburstcloud-demo.gif
 Output demo/aiburstcloud-demo.mp4
 
 Set Shell "bash"
-Set FontFamily "JetBrains Mono"
-Set FontSize 16
+Set FontFamily "Menlo"
+Set FontSize 15
+Set LetterSpacing 0
 Set Width 1200
 Set Height 700
 Set Padding 20
