@@ -14,7 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { overflow-x: hidden; }
+        body { overflow-x: hidden; }
 
         :root {
             --bg: #0d1117;
@@ -107,70 +109,18 @@
             color: var(--text-dim);
         }
 
-        /* --- TERMINAL --- */
+        /* --- TERMINAL / DEMO GIF --- */
         .terminal {
-            background: var(--bg-terminal);
             border: 1px solid var(--border);
             border-radius: 10px;
-            max-width: 680px;
+            max-width: 100%;
             margin: 0 auto;
-            text-align: left;
             overflow: hidden;
         }
-        .terminal-bar {
-            background: var(--bg-card);
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid var(--border);
-        }
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        .terminal-dot.red { background: var(--red); }
-        .terminal-dot.yellow { background: var(--orange); }
-        .terminal-dot.green { background: var(--green); }
-        .terminal-title {
-            color: var(--text-dim);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            margin-left: 8px;
-        }
-        .terminal-body {
-            padding: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            line-height: 1.7;
-            min-height: 200px;
-        }
-        .terminal-body .prompt { color: var(--green); }
-        .terminal-body .cmd { color: var(--text); }
-        .terminal-body .comment { color: var(--text-dim); }
-        .terminal-body .output { color: var(--text-dim); }
-        .terminal-body .highlight { color: var(--accent); }
-        .terminal-body .warn { color: var(--orange); }
-
-        .line {
-            opacity: 0;
-            animation: fadeIn 0.3s ease forwards;
-        }
-        .line:nth-child(1)  { animation-delay: 0.3s; }
-        .line:nth-child(2)  { animation-delay: 0.9s; }
-        .line:nth-child(3)  { animation-delay: 1.5s; }
-        .line:nth-child(4)  { animation-delay: 2.0s; }
-        .line:nth-child(5)  { animation-delay: 2.3s; }
-        .line:nth-child(6)  { animation-delay: 2.6s; }
-        .line:nth-child(7)  { animation-delay: 2.9s; }
-        .line:nth-child(8)  { animation-delay: 3.2s; }
-        .line:nth-child(9)  { animation-delay: 3.5s; }
-        .line:nth-child(10) { animation-delay: 3.8s; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to   { opacity: 1; transform: translateY(0); }
+        .terminal img {
+            display: block;
+            width: 100%;
+            height: auto;
         }
 
         /* --- INSTALL --- */
@@ -205,12 +155,14 @@
             border: 1px solid var(--border);
             border-radius: 6px;
             padding: 14px 16px;
+            padding-right: 60px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
             color: var(--green);
             position: relative;
             overflow-x: auto;
-            white-space: pre;
+            white-space: pre-wrap;
+            word-break: break-all;
             line-height: 1.5;
         }
         .copy-btn {
@@ -245,7 +197,7 @@
         }
         .modes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
             gap: 16px;
         }
         .mode-card {
@@ -274,6 +226,9 @@
             border-radius: 6px;
             margin-bottom: 14px;
             border: 1px solid var(--border);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .mode-card .flow .primary { color: var(--green); }
         .mode-card .flow .burst { color: var(--orange); }
@@ -293,7 +248,7 @@
         }
         .axes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
             gap: 16px;
         }
         .axis-card {
@@ -368,7 +323,12 @@
             .hero { padding: 48px 0 40px; }
             .install, .modes, .axes { padding: 40px 0; }
             .install-grid { grid-template-columns: 1fr; }
-            .nav-links a { margin-left: 16px; }
+            .nav-links a { margin-left: 16px; font-size: 13px; }
+            .btn { display: block; width: 100%; text-align: center; margin-bottom: 10px; }
+            .btn-secondary { margin-left: 0; }
+            .code-block { font-size: 11px; padding: 12px; padding-right: 50px; }
+            .mode-card .flow { font-size: 11px; }
+            .container { padding: 0 16px; }
         }
     </style>
 </head>
